@@ -1,6 +1,7 @@
 package com.ll.demo02;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +23,22 @@ public class TodoController {
         return todos;
     }
 
+    @GetMapping("/details")
+    public Todo getTodos1(long id) {
+        return todos.stream()
+                .filter(todo -> todo.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    @GetMapping("/{id}")
+    public Todo getTodos2(@PathVariable long id) {
+        return todos.stream()
+                .filter(todo -> todo.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
     @GetMapping("/add")
     public Todo add(String body) {
         Todo todo = Todo
@@ -32,5 +49,25 @@ public class TodoController {
         todos.add(todo);
         System.out.println(todo.toString());
         return todo;
+    }
+
+    @GetMapping("/remove/{id}")
+    public boolean remove(@PathVariable long id) {
+        boolean removed = todos.removeIf((todo -> todo.getId() == id));
+        return removed;
+    }
+
+    @GetMapping("modify/{id}")
+    public boolean modify(@PathVariable long id, String body) {
+        Todo todo = todos
+                .stream()
+                .filter(_todo -> _todo.getId() == id)
+                .findFirst()
+                .orElse(null);
+
+        if (todo == null) return false;
+
+        todo.setBody(body);
+        return true;
     }
 }
